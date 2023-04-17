@@ -8,3 +8,4 @@ spec:
   import_name: fix
   tower_auth_secret: awxaccess
   runner_pull_policy: IfNotPresent
+  import_format: yaml
