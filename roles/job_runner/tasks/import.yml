@@ -1,27 +1,25 @@
 - name: Define a Import, if error update AnsibleImport status then end play
   block:
     - name: Register contents of import directory
-      find:
-        paths: /opt/import
+      shell: "ls /opt/import | tail -n 1"
       register: import_contents
 
     - name: Get import file extension
-      ansible.builtin.shell: echo  {{ import_contents.files[0].path }} | sed -n 's/.*\.\(.*\)/\1/p'
+      shell: echo  {{ import_contents.stdout }} | sed -n 's/.*\.\(.*\)/\1/p'
       register: import_file_extension
 
 
-    - name: Launch Import from ConfigMap
+    - name: Launch Import
       awx.awx.import:
-        assets: "{{ lookup('file', '/opt/import/import_me.yaml') | from_{{ import_file_extension }}() }}"
+        assets: '{{ lookup("file", "/opt/import/{{ import_contents.stdout }}") | from_yaml() }}'
       register: Import
+      when: import_file_extension.stdout == "yaml"
 
-    - name: Launch Import from Secret
+    - name: Launch Import
       awx.awx.import:
-        assets: "{{ lookup('file', '/opt/import/import_me.yaml') | from_{{ import_file_extension }}() }}"
+        assets: '{{ lookup("file", "/opt/import/{{ import_contents.stdout }}") | from_json() }}'
       register: Import
-      when:
-        - lookup('env','IMPORT_FORMAT') == 'yaml' and lookup('env','IMPORT_TYPE') == 'secret'
-
+      when: import_file_extension.stdout == "json"
 
   rescue:
     - name: Update status if creation resulted in an error

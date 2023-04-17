@@ -23,8 +23,6 @@ spec:
               value: "{{ import_type }}"
             - name: IMPORT_NAME
               value: "{{ import_name }}"
-            - name: IMPORT_FORMAT
-              value: "{{ import_format }}"
             - name: TOWER_OAUTH_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -43,7 +41,7 @@ spec:
               value: "{{ ansible_operator_meta.namespace }}"
       volumes:
         - name: importfile
-{% if IMPORT_TYPE is defined and IMPORT_TYPE == "configmap" %}
+{% if import_type is defined and import_type == "configmap" %}
           configMap:
             name: {{ kubernetes_resource_name }}
 {% else %}
