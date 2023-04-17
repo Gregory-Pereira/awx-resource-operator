@@ -1,32 +1,27 @@
 - name: Define a Import, if error update AnsibleImport status then end play
   block:
-    - name: Launch Import from ConfigMap from_yaml
-      awx.awx.import:
-        assets: "{{ lookup('file', '/opt/import/import_me.yaml') | from_yaml() }}"
-      register: Import
-      when:
-        - lookup('env','IMPORT_FORMAT') == 'yaml' and lookup('env','IMPORT_TYPE') == 'configmap'
+    - name: Register contents of import directory
+      find:
+        paths: /opt/import
+      register: import_contents
 
-    - name: Launch Import from ConfigMap from_json
-      awx.awx.import:
-        assets: "{{ lookup('file', '/opt/import/import_me.json') | from_json() }}"
-      register: Import
-      when:
-        - lookup('env','IMPORT_FORMAT') == 'json' and lookup('env','IMPORT_TYPE') == 'configmap' 
+    - name: Get import file extension
+      ansible.builtin.shell: echo  {{ import_contents.files[0].path }} | sed -n 's/.*\.\(.*\)/\1/p'
+      register: import_file_extension
 
-    - name: Launch Import from Secret from_yaml
+
+    - name: Launch Import from ConfigMap
       awx.awx.import:
-        assets: "{{ lookup('file', '/opt/import/import_me.yaml') | from_yaml() }}"
+        assets: "{{ lookup('file', '/opt/import/import_me.yaml') | from_{{ import_file_extension }}() }}"
+      register: Import
+
+    - name: Launch Import from Secret
+      awx.awx.import:
+        assets: "{{ lookup('file', '/opt/import/import_me.yaml') | from_{{ import_file_extension }}() }}"
       register: Import
       when:
         - lookup('env','IMPORT_FORMAT') == 'yaml' and lookup('env','IMPORT_TYPE') == 'secret'
 
-    - name: Launch Import from Secret from_json
-      awx.awx.import:
-        assets: "{{ lookup('file', '/opt/import/import_me.json') | from_json() }}"
-      register: Import
-      when:
-        - lookup('env','IMPORT_FORMAT') == 'json' and lookup('env','IMPORT_TYPE') == 'secret'
 
   rescue:
     - name: Update status if creation resulted in an error
