@@ -31,7 +31,7 @@ spec:
             type: object
           spec:
             properties:
-              kuberenetes_resource_name:
+              kubernetes_resource_name:
                 type: string
                 description: Name of the Kubernetes Configmap or Secret
               import_name:
@@ -60,7 +60,7 @@ spec:
                 description: Runner image pull policy used when running jobs
             required:
             - import_type
-            - kuberenetes_resource_name
+            - kubernetes_resource_name
             description: Spec defines the desired state of AnsibleImport
             type: object
             x-kubernetes-preserve-unknown-fields: true
