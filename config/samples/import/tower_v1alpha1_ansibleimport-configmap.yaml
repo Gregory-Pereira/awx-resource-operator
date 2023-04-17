@@ -3,7 +3,7 @@ kind: AnsibleImport
 metadata:
   name: ansibleimport-configmap
 spec:
-  kuberenetes_resource_name: importcm
+  kubernetes_resource_name: importcm
   import_type: configmap
   import_name: fix
   tower_auth_secret: awxaccess
