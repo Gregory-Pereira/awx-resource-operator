@@ -8,7 +8,6 @@
       shell: echo  {{ import_contents.stdout }} | sed -n 's/.*\.\(.*\)/\1/p'
       register: import_file_extension
 
-
     - name: Launch Import
       awx.awx.import:
         assets: '{{ lookup("file", "/opt/import/{{ import_contents.stdout }}") | from_yaml() }}'
