@@ -4,7 +4,6 @@ name: AWX test
 
 on:
   pull_request:
-    branches: [devel, iaac-poc]
 
   push:
     branches: [devel, iacc-poc, configmap-demo]
